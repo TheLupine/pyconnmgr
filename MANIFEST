@@ -1,0 +1,9 @@
+AUTHORS
+COPYING
+INSTALL
+README
+pyConnMgr.desktop
+setup.py
+glade/ConnMgr.png
+glade/connmgr.glade
+src/pyconnmgr

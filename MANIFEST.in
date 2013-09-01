@@ -1,0 +1,2 @@
+include AUTHORS COPYING INSTALL pyConnMgr.desktop README src/pyconnmgr
+recursive-include glade/ *

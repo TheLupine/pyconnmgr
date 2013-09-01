@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=pyconnmgr
+Exec=pyconnmgr
+Terminal=false
+Type=Application
+Icon=/usr/share/pyconnmgr/pyconnmgr32x32.png
+Comment=Python/Glade/GTK frontend for SSH, VNC and rdesktop
+Categories=Application;Internet;

@@ -1,0 +1,9 @@
+To install:
+
+sudo make install
+
+To run, launch:
+
+pyconnmgr
+
+A pyConnMgr.desktop file should also get installed into /usr/share/applications/

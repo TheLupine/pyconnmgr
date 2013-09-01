@@ -1,0 +1,107 @@
+### begin pyconnmgr ChangeLog
+
+version 4.0.0 2013-08-22:
+    * new Fedora build - using TigerVNC
+
+version 3.0.3 2012-10-27:
+    * added m$ licensing fix for rdesktop
+    * this will be the last gtk2 update/build
+
+version 3.0.2 2012-11-08:
+    * fixed glade src path, thanks Butters!
+
+version 3.0.1 2012-10-27:
+    * Quantal release
+
+version 3.0.0 2011-12-19:
+    * fixed import gtk issues
+
+version 3.0.0 2011-12-19:
+    * fixed import gtk issues
+
+version 2.9.9 2011-10-21:
+    * fixed VNC password input
+    
+version 2.9.8 2011-07-27:
+    * updated Connect button (removed underline mnemonic)
+    * fixed readonly bug on SSH user and option entries
+
+version 2.9.7 2011-07-27:
+    * added underlines to various widgets
+
+version 2.9.6 2011-04-11:
+    * added FTP support
+    * fixed Port labels x align
+    * fixed main dialog width adjustment
+    
+version 2.9.5 2011-01-18:
+    * fixed spinbutton values not updating issue
+
+version 2.9.4 2010-10-10:
+    * Ubuntu 10.10 release
+
+version 2.9.3 2010-08-10:
+    * added SMB feature (similar to SFTP feature)
+    
+version 2.9.2 2010-06-27:
+    * added SFTP feature (idea by itnet7: https://wiki.ubuntu.com/itnet7)
+
+version 2.9.1 2010-02-03:
+    * fixed "space" issue with RDP username and domain
+
+version 2.9 2010-01-24:
+    * replaced os.popen with subprocess
+    * code cosmetic fixes (80 column limit)
+    * updated in-line documentation
+    
+version 2.8 2010-01-21:
+    * added some more try|exception error checking
+    * added the Edit -> Hosts back (allows multiple deletions)
+
+version 2.7 2010-01-01:
+    * any architecture build
+    
+version 2.6 2009-12-10:
+    * fixed VNC password with non-alphanumeric char issue
+
+version 2.5 2009-10-30:
+    * karmic release
+
+version 2.4 2009-10-14:
+    * app will now save last connected tab position for each host
+
+version 2.3 2009-05-25:
+    * migrated to GtkBuilder instead of Libglade
+    * fixed clearing of current values, when switching hosts
+
+version 2.2 2009-05-17:
+    * fixed changing notebook tab function, to properly change host values
+
+version 2.1 2009-05-17:
+    * fixed path for glade file
+
+version 2.0 2009-05-17:
+    * added sqlite3 support, saves ALL settings to sql file
+
+version 1.2.4 2009-03-17:
+    * added error_dialog when no host is provided
+
+version 1.2.3 2009-03-16:
+    * fixed the Alt+F4 closing issue for about, pref and find
+
+version 1.2.2 2009-03-14:
+    * added new images (branding)
+    * added find abilities to hosts list (cut/copy/paste/find)
+        
+version 1.2.1 2009-03-03
+    * updated 1.2.1 version numbering
+    * automated versioning numbering into variables
+    * fixed Glade file to reflect versioning changes
+    
+version 1.1 2009-03-01
+    * fixed VNC and ssh spawning issue (added '&' to the os.popen method)
+    
+version 1.0 2009-02-26: 
+    * Initial Release Available
+
+### end pyconnmgr ChangeLog
