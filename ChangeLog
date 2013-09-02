@@ -1,5 +1,8 @@
 ### begin pyconnmgr ChangeLog
 
+version 4.0.1 2013-09-02
+    * update .desktop file, fixed correct Category
+
 version 4.0.0 2013-08-22:
     * new Fedora build - using TigerVNC
 

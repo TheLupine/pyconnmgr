@@ -2,23 +2,24 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 
 Name:           pyconnmgr
-Version:        4.0.0
+Version:        4.0.1
 Release:        4%{?dist}
 Summary:        Simple Python/Glade frontend to SSH, VNC and rdesktop commands.
 Group:          Applications/Internet
 
 License:        GPL v2
 URL:            http://www.thelupine.com/pyconnmgr
-Source0:        pyconnmgr-4.0.0.tar.gz
+Source0:        pyconnmgr-4.0.1.tar.gz
 
 BuildArch:      noarch
-BuildRequires:  
+BuildRequires:  python
 Requires:       sqlite, pexpect, tigervnc, gnome-terminal, rdesktop
 
 %description
-pyconnmgr is a simple Python/Glade frontend to SSH, VNC and rdesktop commands. \
-It was created as a learning process for developing in Python and Glade. Even though this was \
-created as a learning process, the application itself turned out to be very useful.
+pyconnmgr is a simple Python/Glade frontend to SSH, VNC and rdesktop commands.
+It was created as a learning process for developing in Python and Glade. Even
+though this was created as a learning process, the application itself turned
+out to be very useful
 
 
 %prep
@@ -51,5 +52,8 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Sep 2 2013 TheLupine <thelupine@gmail.com> - 4.0.1
+- updated .desktop file, fixed Categories issue
+
 * Sat Aug 31 2013 TheLupine <thelupine@gmail.com> - 4.0.0
 - new Fedora build - using TigerVNC
