@@ -12,7 +12,8 @@ URL:            http://www.thelupine.com/pyconnmgr
 Source0:        pyconnmgr-4.0.0.tar.gz
 
 BuildArch:      noarch
-BuildRequires:  sqlite, pexpect, tigervnc, gnome-terminal, rdesktop
+BuildRequires:  
+Requires:       sqlite, pexpect, tigervnc, gnome-terminal, rdesktop
 
 %description
 pyconnmgr is a simple Python/Glade frontend to SSH, VNC and rdesktop commands. \
