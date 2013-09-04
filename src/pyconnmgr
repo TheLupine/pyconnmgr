@@ -16,10 +16,10 @@ from subprocess import Popen, PIPE
 from gi.repository import Gtk
 
 APPNAME     = "pyconnmgr"
-APPVERSION  = "4.0.0"
+APPVERSION  = "4.0.2"
 APPCONFDIR  = "/.pyconnmgr"
 GLADE_FILE  = "/usr/share/pyconnmgr/pyconnmgr.glade"
-GLADE_FILE  = "glade/pyconnmgr.glade"
+#GLADE_FILE  = "glade/pyconnmgr.glade"
 HOSTSFILE   = os.environ["HOME"] + APPCONFDIR + "/hostsfile.db"
 
 print "\n\n" + APPNAME + " version " + APPVERSION + ", Copyright (C) 2008\n"
