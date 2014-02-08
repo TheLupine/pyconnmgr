@@ -1,6 +1,6 @@
 					pyConnMgr
 					
-Python/GTK/Glade frontend to the SSH, VNC and rdesktop commands.
+Python/GTK/Glade frontend to the SSH/SFTP, FTP, SMB, VNC, and RDP.
 
 See the INSTALL file for installation instructions.
 See the AUTHORS file for developer information.

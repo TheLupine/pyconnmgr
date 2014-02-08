@@ -7,7 +7,7 @@
 
     author:         Lupine  - http://www.thelupine.com
 
-    description:    Python/GTK/Glade frontend to the SSH, VNC and rdesktop
+    description:    Python/GTK/Glade frontend to the SSH/SFTP, FTP, SMB, VNC, and RDP.
 
 """
 
@@ -16,7 +16,7 @@ from subprocess import Popen, PIPE
 from gi.repository import Gtk
 
 APPNAME     = "pyconnmgr"
-APPVERSION  = "4.0.2"
+APPVERSION  = "4.0.3"
 APPCONFDIR  = "/.pyconnmgr"
 GLADE_FILE  = "/usr/share/pyconnmgr/pyconnmgr.glade"
 #GLADE_FILE  = "glade/pyconnmgr.glade"
@@ -589,16 +589,22 @@ class ConnectionManager:
                 commandspawn = Popen(command)
             elif selectedtab == 3:
                 #we are on the RDP tab
-                command = ['rdesktop','-b','-g',rdpgeometry]
+                command = ['xfreerdp']
                 if len(rdpuser) != 0:
-                    pyrdpuser = '-u' + rdpuser
+                    pyrdpuser = '-u ' + rdpuser
                     command.append(pyrdpuser)
                 if len(rdpdomain) != 0:
                     pyrdpdomain= '-d' + rdpdomain
                     command.append(pyrdpdomain)
+                if rdpgeometry == 'FULLSCREEN':
+                    pyrdpgeometry = '-f'
+                else:
+                    pyrdpgeometry = '-g' + rdpgeometry
+                command.append(pyrdpgeometry)
                 command.append(host)
+                print str(command) + "\n"
                 #due to m$ licsening change for 2008+ servers, we now need this:
-                mslicfile = os.environ["HOME"] + "/.rdesktop/licence.*"
+                mslicfile = os.environ["HOME"] + "/.freerdp/licence.*"
                 for x in glob.glob(mslicfile):
                     os.unlink(x)
                 commandspawn = Popen(command)

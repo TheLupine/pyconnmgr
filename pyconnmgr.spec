@@ -2,21 +2,21 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 
 Name:           pyconnmgr
-Version:        4.0.2
+Version:        4.0.3
 Release:        1%{?dist}
-Summary:        Simple Python/Glade front-end to SSH, VNC and rdesktop commands
+Summary:        Simple Python/Glade front-end to SSH/SFTP, FTP, SMB, VNC, and RDP
 Group:          Applications/Internet
 
 License:        GPLv2
 URL:            http://www.thelupine.com/pyconnmgr
-Source0:        pyconnmgr-4.0.2.tar.gz
+Source0:        pyconnmgr-4.0.3.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  python
-Requires:       pygobject3, sqlite, pexpect, tigervnc, gnome-terminal, rdesktop
+Requires:       pygobject3, sqlite, pexpect, tigervnc, gnome-terminal, freerdp
 
 %description
-pyconnmgr is a simple Python/Glade front-end to SSH, VNC and rdesktop commands.
+pyconnmgr is a simple Python/Glade front-end to SSH/SFTP, FTP, SMB, VNC, and RDP.
 It was created as a learning process for developing in Python and Glade. Even
 though this was created as a learning process, the application itself turned
 out to be very useful
@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Feb 6 2014 TheLupine <thelupine@gmail.com> - 4.0.3-1
+- replaced rdesktop with freerdp
+
 * Tue Sep 3 2013 TheLupine <thelupine@gmail.com> - 4.0.2-1
 - added man file
 

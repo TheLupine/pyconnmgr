@@ -1,5 +1,14 @@
 ### begin pyconnmgr ChangeLog
 
+version 4.0.3 2013-02-06
+    * replaced rdestop with freerdp
+
+version 4.0.2 2013-09-02
+    * added man files for Fedora
+
+version 4.0.1 2013-09-02
+    * update .desktop file, fixed correct Category
+
 version 4.0.1 2013-09-02
     * update .desktop file, fixed correct Category
 
