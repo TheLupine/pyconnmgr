@@ -2,18 +2,18 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 
 Name:           pyconnmgr
-Version:        4.0.3
+Version:        4.0.4
 Release:        1%{?dist}
 Summary:        Simple Python/Glade front-end to SSH/SFTP, FTP, SMB, VNC, and RDP
 Group:          Applications/Internet
 
 License:        GPLv2
 URL:            http://www.thelupine.com/pyconnmgr
-Source0:        pyconnmgr-4.0.3.tar.gz
+Source0:        pyconnmgr-4.0.4.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  python
-Requires:       pygobject3, sqlite, pexpect, tigervnc, gnome-terminal, freerdp
+Requires:       pygobject3, sqlite, pexpect, tigervnc, gnome-terminal, rdesktop
 
 %description
 pyconnmgr is a simple Python/Glade front-end to SSH/SFTP, FTP, SMB, VNC, and RDP.
@@ -51,6 +51,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Feb 12 2014 TheLupine <thelupine@gmail.com> - 4.0.4-1
+- had to switch back to rdesktop, Popen is not launching xfreerdp correctly
+- major updates on the database schema checker/updater
+
 * Thu Feb 6 2014 TheLupine <thelupine@gmail.com> - 4.0.3-1
 - replaced rdesktop with freerdp
 

@@ -1,13 +1,14 @@
 ### begin pyconnmgr ChangeLog
 
-version 4.0.3 2013-02-06
-    * replaced rdestop with freerdp
+version 4.0.4 2014-02-12
+    * had to switch back to rdesktop, Popen isn't launching xfreerdp correctly
+    * major updates on the database schema checker/updater
+
+version 4.0.3 2014-02-06
+    * replaced rdesktop with freerdp
 
 version 4.0.2 2013-09-02
     * added man files for Fedora
-
-version 4.0.1 2013-09-02
-    * update .desktop file, fixed correct Category
 
 version 4.0.1 2013-09-02
     * update .desktop file, fixed correct Category

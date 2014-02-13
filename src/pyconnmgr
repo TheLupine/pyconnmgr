@@ -16,7 +16,8 @@ from subprocess import Popen, PIPE
 from gi.repository import Gtk
 
 APPNAME     = "pyconnmgr"
-APPVERSION  = "4.0.3"
+APPVERSION  = "4.0.4"
+DBVERSION   = "hosts" + APPVERSION.replace(".","")
 APPCONFDIR  = "/.pyconnmgr"
 GLADE_FILE  = "/usr/share/pyconnmgr/pyconnmgr.glade"
 #GLADE_FILE  = "glade/pyconnmgr.glade"
@@ -28,7 +29,6 @@ print "GNU GENERAL PUBLIC LICENSE and is free and open source software."
 print "http://www.thelupine.com\n\n"
 
 class ConnectionManager:
-
     def check_appconfig_dir(self):
         """
         This function will create the ENV HOME app config directory
@@ -57,72 +57,77 @@ class ConnectionManager:
         if os.path.isfile(HOSTSFILE):
             sqlconn = sqlite3.connect(HOSTSFILE)
             sqlcursor = sqlconn.cursor()
-            sqlcursor.execute('''pragma table_info('hosts')''')
+            sqlcursor.execute("pragma table_info('hosts')")
+            #current table schema should look like this
             """
-            # this is what the current schema should look like
             0|name|text|0||0
-            1|sshport|int|0||0
-            2|sshuser|text|0||0
-            3|sshopt|text|0||0
-            4|vnctrucolor|int|0||0
-
-            6|vncquality|int|0||0
-            7|vnccompresslevel|int|0||0
-            8|vncport|int|0||0
-            9|vncpassword|text|0||0
-
-            11|rdpgeom|text|0||0
-            12|rdpuser|text|0||0
-            13|rdpdom|text|0||0
-            14|tab|int|0||0
-            15|sftpport|int|0||0
-            16|sftpuser|text|0||0
-            17|sftppath|text|0||0
-            18|smbuser|text|0||0
-            19|smbpath|text|0||0
-            20|ftpport|int|0||0
-            21|ftpuser|text|0||0
-            22|ftppath|text|0||0
+            1|tab|int|0||0
+            2|sshport|int|0||0
+            3|sshuser|text|0||0
+            4|sshopt|text|0||0
+            5|vncquality|int|0||0
+            6|vnccompresslevel|int|0||0
+            7|vncport|int|0||0
+            8|vncpassword|text|0||0
+            9|rdpgeom|text|0||0
+            10|rdpuser|text|0||0
+            11|rdpdom|text|0||0
+            12|sftpport|int|0||0
+            13|sftpuser|text|0||0
+            14|sftppath|text|0||0
+            15|smbuser|text|0||0
+            16|smbpath|text|0||0
+            17|ftpport|int|0||0
+            18|ftpuser|text|0||0
+            19|ftppath|text|0||0
+            20|<DBVERSION>|int|0||0  # this is used to keep the sql schema up to date
             """
-            col_name_list = [tuple[0] for tuple in sqlcursor.description]
-            #check if "tab" schema update has been done
-            for col_name in col_name_list:
-                if not re.search('14|tab|int|0||0', col_name):
-                    sqlcursor.execute('''ALTER TABLE hosts ADD tab int''')
-                    sqlconn.commit()
-                else:
-                    break
-            #check if "sftp" schema update has been done
-            for col_name in col_name_list:
-                if not re.search('15|sftpport|int|0||0', col_name):
-                    sqlcursor.execute('''ALTER TABLE hosts ADD sftpport int''')
-                    sqlconn.commit()
-                    sqlcursor.execute('''ALTER TABLE hosts ADD sftpuser text''')
-                    sqlconn.commit()
-                    sqlcursor.execute('''ALTER TABLE hosts ADD sftppath text''')
-                    sqlconn.commit()
-                else:
-                    break
-            #check if "smb" schema update has been done
-            for col_name in col_name_list:
-                if not re.search('19|smbpath|text|0||0', col_name):
-                    sqlcursor.execute('''ALTER TABLE hosts ADD smbuser text''')
-                    sqlconn.commit()
-                    sqlcursor.execute('''ALTER TABLE hosts ADD smbpath text''')
-                    sqlconn.commit()
-                else:
-                    break
-            #check if "ftp" schema update has been done
-            for col_name in col_name_list:
-                if not re.search('20|ftpport|int|0||0', col_name):
-                    sqlcursor.execute('''ALTER TABLE hosts ADD ftpport int''')
-                    sqlconn.commit()
-                    sqlcursor.execute('''ALTER TABLE hosts ADD ftpuser text''')
-                    sqlconn.commit()
-                    sqlcursor.execute('''ALTER TABLE hosts ADD ftppath text''')
-                    sqlconn.commit()
-                else:
-                    break
+            currentschema = str(sqlcursor.fetchall())
+            #check if current schema matches, update if not
+            if not re.search(DBVERSION, currentschema):
+                sqlcursor.execute('''CREATE TABLE IF NOT EXISTS {} 
+                                        (name text,
+                                        tab int,
+                                        sshport int,
+                                        sshuser text,
+                                        sshopt text,
+                                        vncquality int,
+                                        vnccompresslevel int,
+                                        vncport int,
+                                        vncpassword text,
+                                        rdpgeom text,
+                                        rdpuser text,
+                                        rdpdom text,
+                                        sftpport int,
+                                        sftpuser text,
+                                        sftppath text,
+                                        smbuser text,
+                                        smbpath text,
+                                        ftpport int,
+                                        ftpuser text,
+                                        ftppath text,
+                                        {} int)'''.format(DBVERSION,DBVERSION))
+                sqlconn.commit()
+                sqlcursor.execute('''INSERT INTO {} 
+                                        (name,tab,sshport,sshuser,sshopt,
+                                        vncquality,vnccompresslevel,vncport,vncpassword,
+                                        rdpgeom,rdpuser,rdpdom,
+                                        sftpport,sftpuser,sftppath,smbuser,smbpath,
+                                        ftpport,ftpport,ftppath,{})
+                                    SELECT name,tab,sshport,sshuser,sshopt,
+                                        vncquality,vnccompresslevel,vncport,vncpassword,
+                                        rdpgeom,rdpuser,rdpdom,
+                                        sftpport,sftpuser,sftppath,smbuser,smbpath,
+                                        ftpport,ftpport,ftppath,0 
+                                    FROM hosts'''.format(DBVERSION,DBVERSION))
+                sqlconn.commit()
+                sqlcursor.execute('''DROP TABLE IF EXISTS hosts''')
+                sqlconn.commit()
+                sqlcursor.execute('''ALTER TABLE {}
+                                    RENAME TO hosts'''.format(DBVERSION))
+                sqlconn.commit()
+                sqlconn.close
+                
         else:
             try:
                 sqlite3.connect(HOSTSFILE)
@@ -136,8 +141,9 @@ class ConnectionManager:
             else:
                 sqlconn = sqlite3.connect(HOSTSFILE)
                 sqlcursor = sqlconn.cursor()
-                sqlcursor.execute('''create table if not exists hosts
+                sqlcursor.execute('''CREATE TABLE IF NOT EXISTS hosts 
                                         (name text,
+                                        tab int,
                                         sshport int,
                                         sshuser text,
                                         sshopt text,
@@ -148,7 +154,6 @@ class ConnectionManager:
                                         rdpgeom text,
                                         rdpuser text,
                                         rdpdom text,
-                                        tab int,
                                         sftpport int,
                                         sftpuser text,
                                         sftppath text,
@@ -156,7 +161,8 @@ class ConnectionManager:
                                         smbpath text,
                                         ftpport int,
                                         ftpuser text,
-                                        ftppath text)''')
+                                        ftppath text,
+                                        {} int)'''.format(DBVERSION))
                 sqlconn.commit()
                 sqlconn.close
 
@@ -203,97 +209,97 @@ class ConnectionManager:
                 hostname = ""
 
             if (row[1]):
-                hostsshport = row[1]
-            else:
-                hostsshport = 22
-
-            if (row[2]):
-                hostsshuser = row[2]
-            else:
-                hostsshuser = ""
-
-            if (row[3]):
-                hostsshopt = row[3]
-            else:
-                hostsshopt = ""
-
-            if (row[6]):
-                hostvncquality = row[6]
-            else:
-                hostvncquality = 9
-
-            if (row[7]):
-                hostvnccompresslevel = row[7]
-            else:
-                hostvnccompresslevel = 9
-
-            if (row[8]):
-                hostvncport = row[8]
-            else:
-                hostvncport = 5900
-
-            if (row[9]):
-                hostvncpassword = row[9]
-            else:
-                hostvncpassword = ""
-
-            if (row[11]):
-                hostrdpgeom = row[11]
-            else:
-                hostrdpgeom = ""
-
-            if (row[12]):
-                hostrdpuser = row[12]
-            else:
-                hostrdpuser = ""
-
-            if (row[13]):
-                hostrdpdom = row[13]
-            else:
-                hostrdpdom = ""
-
-            if (row[14]):
-                tabposition = row[14]
+                tabposition = row[1]
             else:
                 tabposition = 0
 
-            if (row[15]):
-                hostsftpport = row[15]
+            if (row[2]):
+                hostsshport = row[2]
+            else:
+                hostsshport = 22
+
+            if (row[3]):
+                hostsshuser = row[3]
+            else:
+                hostsshuser = ""
+
+            if (row[4]):
+                hostsshopt = row[4]
+            else:
+                hostsshopt = ""
+
+            if (row[5]):
+                hostvncquality = row[5]
+            else:
+                hostvncquality = 9
+
+            if (row[6]):
+                hostvnccompresslevel = row[6]
+            else:
+                hostvnccompresslevel = 9
+
+            if (row[7]):
+                hostvncport = row[7]
+            else:
+                hostvncport = 5900
+
+            if (row[8]):
+                hostvncpassword = row[8]
+            else:
+                hostvncpassword = ""
+
+            if (row[9]):
+                hostrdpgeom = row[9]
+            else:
+                hostrdpgeom = ""
+
+            if (row[10]):
+                hostrdpuser = row[10]
+            else:
+                hostrdpuser = ""
+
+            if (row[11]):
+                hostrdpdom = row[11]
+            else:
+                hostrdpdom = ""
+
+            if (row[12]):
+                hostsftpport = row[12]
             else:
                 hostsftpport = 22
 
-            if (row[16]):
-                hostsftpuser = row[16]
+            if (row[13]):
+                hostsftpuser = row[13]
             else:
                 hostsftpuser = ""
 
-            if (row[17]):
-                hostsftppath = row[17]
+            if (row[14]):
+                hostsftppath = row[14]
             else:
                 hostsftppath = ""
 
-            if (row[18]):
-                hostsmbuser = row[18]
+            if (row[15]):
+                hostsmbuser = row[15]
             else:
                 hostsmbuser = ""
 
-            if (row[19]):
-                hostsmbpath = row[19]
+            if (row[16]):
+                hostsmbpath = row[16]
             else:
                 hostsmbpath = ""
 
-            if (row[20]):
-                hostftpport = row[20]
+            if (row[17]):
+                hostftpport = row[17]
             else:
                 hostftpport = 21
 
-            if (row[21]):
-                hostftpuser = row[21]
+            if (row[18]):
+                hostftpuser = row[18]
             else:
                 hostftpuser = ""
 
-            if (row[22]):
-                hostftppath = row[22]
+            if (row[19]):
+                hostftppath = row[19]
             else:
                 hostftppath = ""
 
@@ -351,13 +357,14 @@ class ConnectionManager:
             if hostname == host:
                 foundhost = "yes"
                 #host already exist, so update information
-                values = (sshport,sshuser,sshoptions, \
+                values = (selectedtab,sshport,sshuser,sshoptions, \
                         vncquality,vnccompresslevel,vncport,vncpasswd, \
-                        rdpgeometry,rdpuser,rdpdomain,selectedtab, \
+                        rdpgeometry,rdpuser,rdpdomain, \
                         sftpport,sftpuser,sftppath,smbuser,smbpath, \
                         ftpport,ftpuser,ftppath,host)
                 sqlcursor.execute('''
                         UPDATE hosts SET
+                                tab=?,
                                 sshport=?,
                                 sshuser=?,
                                 sshopt=?,
@@ -368,7 +375,6 @@ class ConnectionManager:
                                 rdpgeom=?,
                                 rdpuser=?,
                                 rdpdom=?,
-                                tab=?,
                                 sftpport=?,
                                 sftpuser=?,
                                 sftppath=?,
@@ -381,11 +387,11 @@ class ConnectionManager:
         if foundhost == "no":
             #host didn't exist, so insert new host information
             sqlcursor.execute('''
-                    INSERT INTO hosts VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-                    ''',(host,sshport,sshuser,sshoptions, \
+                    INSERT INTO hosts VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    ''',(host,selectedtab,sshport,sshuser,sshoptions, \
                     vncquality,vnccompresslevel,vncport,vncpasswd, \
-                    rdpgeometry,rdpuser,rdpdomain,selectedtab,sftpport,sftpuser, \
-                    sftppath,smbuser,smbpath,ftpport,ftpuser,ftppath) )
+                    rdpgeometry,rdpuser,rdpdomain,sftpport,sftpuser, \
+                    sftppath,smbuser,smbpath,ftpport,ftpuser,ftppath,0) )
         #update and close the database
         sqlconn.commit()
         sqlconn.close()
@@ -589,25 +595,25 @@ class ConnectionManager:
                 commandspawn = Popen(command)
             elif selectedtab == 3:
                 #we are on the RDP tab
-                command = ['xfreerdp']
+                command = ['rdesktop']
+                
                 if len(rdpuser) != 0:
-                    pyrdpuser = '-u ' + rdpuser
-                    command.append(pyrdpuser)
+                    command.append("-u " + rdpuser)
                 if len(rdpdomain) != 0:
-                    pyrdpdomain= '-d' + rdpdomain
-                    command.append(pyrdpdomain)
+                    command.append("-d " + rdpdomain)
                 if rdpgeometry == 'FULLSCREEN':
                     pyrdpgeometry = '-f'
                 else:
-                    pyrdpgeometry = '-g' + rdpgeometry
+                    pyrdpgeometry = '-g ' + rdpgeometry
                 command.append(pyrdpgeometry)
                 command.append(host)
-                print str(command) + "\n"
                 #due to m$ licsening change for 2008+ servers, we now need this:
                 mslicfile = os.environ["HOME"] + "/.freerdp/licence.*"
                 for x in glob.glob(mslicfile):
                     os.unlink(x)
+                #commandspawn = Popen(command, stdout=open("/dev/null", "w"), stderr=open("/dev/null", "w"))
                 commandspawn = Popen(command)
+                print str(command) + "\n"
             elif selectedtab == 4:
                 #we are on the SMB tab
                 nautilusURI = 'smb://' + smbuser + '@' + host + "/" + smbpath
