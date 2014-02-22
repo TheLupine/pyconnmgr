@@ -16,7 +16,7 @@ from subprocess import Popen, PIPE
 from gi.repository import Gtk
 
 APPNAME     = "pyconnmgr"
-APPVERSION  = "4.0.4"
+APPVERSION  = "4.0.5"
 DBVERSION   = "hosts" + APPVERSION.replace(".","")
 APPCONFDIR  = "/.pyconnmgr"
 GLADE_FILE  = "/usr/share/pyconnmgr/pyconnmgr.glade"
@@ -595,17 +595,18 @@ class ConnectionManager:
                 commandspawn = Popen(command)
             elif selectedtab == 3:
                 #we are on the RDP tab
-                command = ['rdesktop']
-                
+                command = ['xfreerdp']
                 if len(rdpuser) != 0:
-                    command.append("-u " + rdpuser)
+                    command.append('-u')
+                    command.append(rdpuser)
                 if len(rdpdomain) != 0:
-                    command.append("-d " + rdpdomain)
+                    command.append('-d')
+                    command.append(rdpdomain)
                 if rdpgeometry == 'FULLSCREEN':
-                    pyrdpgeometry = '-f'
+                    command.append('-f')
                 else:
-                    pyrdpgeometry = '-g ' + rdpgeometry
-                command.append(pyrdpgeometry)
+                    command.append('-g')
+                    command.append(rdpgeometry)
                 command.append(host)
                 #due to m$ licsening change for 2008+ servers, we now need this:
                 mslicfile = os.environ["HOME"] + "/.freerdp/licence.*"
@@ -613,7 +614,6 @@ class ConnectionManager:
                     os.unlink(x)
                 #commandspawn = Popen(command, stdout=open("/dev/null", "w"), stderr=open("/dev/null", "w"))
                 commandspawn = Popen(command)
-                print str(command) + "\n"
             elif selectedtab == 4:
                 #we are on the SMB tab
                 nautilusURI = 'smb://' + smbuser + '@' + host + "/" + smbpath

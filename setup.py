@@ -7,7 +7,7 @@ import glob
 
 glade_files = glob.glob("glade/*")    
 setup(name = "pyconnmgr",
-    version = "4.0.3",
+    version = "4.0.5",
     description = "Simple Python/Glade frontend to SSH/SFTP, FTP, SMB, VNC, and RDP",
     author = "Lupine",
     author_email = "thelupine@gmail.com",

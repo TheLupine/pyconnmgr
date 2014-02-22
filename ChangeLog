@@ -1,5 +1,8 @@
 ### begin pyconnmgr ChangeLog
 
+version 4.0.5 2014-02-22
+    * Thanks to a Google+ response, xfreerdp working correctly now
+
 version 4.0.4 2014-02-12
     * had to switch back to rdesktop, Popen isn't launching xfreerdp correctly
     * major updates on the database schema checker/updater
