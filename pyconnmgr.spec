@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sat Aug 16 2014 TheLupine <thelupine@gmail.com> - 4.0.6-1
+- fixed the "no password" VNC issue
+
 * Sat Feb 22 2014 TheLupine <thelupine@gmail.com> - 4.0.5-1
 - thanks to a Google+ response, xfreerdp working correctly now
     

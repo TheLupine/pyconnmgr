@@ -1,5 +1,8 @@
 ### begin pyconnmgr ChangeLog
 
+version 4.0.6 2014-08-16
+    * fix "no password" vnc issue
+    
 version 4.0.5 2014-02-22
     * Thanks to a Google+ response, xfreerdp working correctly now
 

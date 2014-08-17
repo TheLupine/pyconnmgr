@@ -16,7 +16,7 @@ from subprocess import Popen, PIPE
 from gi.repository import Gtk
 
 APPNAME     = "pyconnmgr"
-APPVERSION  = "4.0.5"
+APPVERSION  = "4.0.6"
 DBVERSION   = "hosts" + APPVERSION.replace(".","")
 APPCONFDIR  = "/.pyconnmgr"
 GLADE_FILE  = "/usr/share/pyconnmgr/pyconnmgr.glade"
@@ -579,18 +579,20 @@ class ConnectionManager:
                 commandspawn = Popen(command)
             elif selectedtab == 2:
                 #we are on the VNC tab
-                vncpassdwfile = os.environ["HOME"] + APPCONFDIR + '/vncpasswd.tmp'
-                child = pexpect.spawn('vncpasswd ' + vncpassdwfile )
-                child.expect('Password:')
-                child.sendline(vncpasswd)
-                child.expect('Verify:')
-                child.sendline(vncpasswd)
-                child.expect(pexpect.EOF, timeout=None)
                 vnchostport = host + ":" + vncport
                 command = ['vncviewer', \
-                            '-PasswordFile', vncpassdwfile, \
                             '-QualityLevel', vncquality, \
                             '-CompressLevel', vnccompresslevel]
+                if vncpasswd:
+                    vncpassdwfile = os.environ["HOME"] + APPCONFDIR + '/vncpasswd.tmp'
+                    child = pexpect.spawn('vncpasswd ' + vncpassdwfile )
+                    child.expect('Password:')
+                    child.sendline(vncpasswd)
+                    child.expect('Verify:')
+                    child.sendline(vncpasswd)
+                    child.expect(pexpect.EOF, timeout=None)
+                    command.append('-PasswordFile')
+                    command.append(vncpassdwfile)
                 command.append(vnchostport)
                 commandspawn = Popen(command)
             elif selectedtab == 3:
@@ -639,10 +641,6 @@ class ConnectionManager:
             print errormessage
             self.error_message_textview.set_text(errormessage)
             self.error_dialog.show()
-
-    def spawn_child(self, command, parms):
-        """This function will spawn the child process"""
-        child = subprocess.Popen([command, parms])
 
     def __init__(self):
         gtkbuilder = Gtk.Builder()
