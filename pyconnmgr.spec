@@ -2,14 +2,14 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 
 Name:           pyconnmgr
-Version:        4.0.5
+Version:        4.0.7
 Release:        1%{?dist}
 Summary:        Simple Python/Glade front-end to SSH/SFTP, FTP, SMB, VNC, and RDP
 Group:          Applications/Internet
 
 License:        GPLv2
 URL:            http://www.thelupine.com/pyconnmgr
-Source0:        pyconnmgr-4.0.5.tar.gz
+Source0:        pyconnmgr-4.0.7.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  python
@@ -51,6 +51,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Dec 21 2015 TheLupine <thelupine@gmail.com> - 4.0.7-1
+- fixed another password vnc issue - expect('Would you like to enter a view-only password')
+- fixed PyGIWarning about gi.require_version('Gtk', '3.0')
+    
 * Sat Aug 16 2014 TheLupine <thelupine@gmail.com> - 4.0.6-1
 - fixed the "no password" VNC issue
 

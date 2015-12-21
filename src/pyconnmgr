@@ -3,27 +3,42 @@
 """
     title:          Python Connections Manager
 
-    date:           10.14.2009
+    date:           06.23.2015
 
     author:         Lupine  - http://www.thelupine.com
 
     description:    Python/GTK/Glade frontend to the SSH/SFTP, FTP, SMB, VNC, and RDP.
+    
+    license:        GPL3
+    pyconnmgr is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    pyconnmgr is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with pyconnmgr.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 
-import sys, os, glob, signal, time, re, sqlite3, pexpect
+import sys, os, glob, signal, time, re, sqlite3, pexpect, gi
+gi.require_version("Gtk", "3.0")
 from subprocess import Popen, PIPE
 from gi.repository import Gtk
 
 APPNAME     = "pyconnmgr"
-APPVERSION  = "4.0.6"
+APPVERSION  = "4.0.7"
 DBVERSION   = "hosts" + APPVERSION.replace(".","")
 APPCONFDIR  = "/.pyconnmgr"
 GLADE_FILE  = "/usr/share/pyconnmgr/pyconnmgr.glade"
 #GLADE_FILE  = "glade/pyconnmgr.glade"
 HOSTSFILE   = os.environ["HOME"] + APPCONFDIR + "/hostsfile.db"
 
-print "\n\n" + APPNAME + " version " + APPVERSION + ", Copyright (C) 2008\n"
+print "\n\n" + APPNAME + " version " + APPVERSION + "\n"
 print APPNAME + " comes with ABSOLUTELY NO WARRANTY, is licensed under the"
 print "GNU GENERAL PUBLIC LICENSE and is free and open source software."
 print "http://www.thelupine.com\n\n"
@@ -569,7 +584,7 @@ class ConnectionManager:
                 sshuserhost = 'ssh ' + sshoptions + ' -p ' + sshport + \
                                 ' ' + sshuser + "@" + host
                 command = ['gnome-terminal', '--geometry', '110x25', \
-                            '-t', host, '-e', sshuserhost]
+                            host, '-e', sshuserhost]
                 commandspawn = Popen(command)
             elif selectedtab == 1:
                 #we are on the SFTP tab
@@ -590,6 +605,8 @@ class ConnectionManager:
                     child.sendline(vncpasswd)
                     child.expect('Verify:')
                     child.sendline(vncpasswd)
+                    child.expect('Would you like to enter a view-only password')
+                    child.sendline('n')
                     child.expect(pexpect.EOF, timeout=None)
                     command.append('-PasswordFile')
                     command.append(vncpassdwfile)
@@ -614,7 +631,6 @@ class ConnectionManager:
                 mslicfile = os.environ["HOME"] + "/.freerdp/licence.*"
                 for x in glob.glob(mslicfile):
                     os.unlink(x)
-                #commandspawn = Popen(command, stdout=open("/dev/null", "w"), stderr=open("/dev/null", "w"))
                 commandspawn = Popen(command)
             elif selectedtab == 4:
                 #we are on the SMB tab
@@ -714,12 +730,11 @@ class ConnectionManager:
             'on_ftp_path_entry_activate' : self.on_connect_btn_clicked,
             'on_hosts_cancel_btn_clicked' : self.on_hosts_cancel_btn_clicked,
             'on_hosts_apply_btn_clicked' : self.on_hosts_apply_btn_clicked,
+            'on_hosts_menu_save_activate' : self.on_hosts_apply_btn_clicked,
             'on_hosts_menu_find_activate' : self.on_hosts_menu_find_activate,
             'on_hosts_menu_cut_activate' : self.on_hosts_menu_cut_activate,
             'on_hosts_menu_copy_activate' : self.on_hosts_menu_copy_activate,
             'on_hosts_menu_paste_activate' : self.on_hosts_menu_paste_activate,
-            'on_hosts_menu_delete_activate' : \
-                                    self.on_hosts_menu_delete_activate,
             'on_del_menu_activate' : self.on_del_menu_activate,
             'on_hosts_menu_activate' : self.on_hosts_menu_activate,
             'on_hosts_dialog_delete_event' : self.on_hosts_dialog_delete_event,

@@ -1,5 +1,9 @@
 ### begin pyconnmgr ChangeLog
 
+version 4.0.7 2015-12-21
+    * fixed another password vnc issue - expect('Would you like to enter a view-only password')
+    * fixed PyGIWarning about gi.require_version('Gtk', '3.0')
+
 version 4.0.6 2014-08-16
     * fix "no password" vnc issue
     
