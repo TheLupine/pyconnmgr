@@ -31,11 +31,11 @@ from subprocess import Popen, PIPE
 from gi.repository import Gtk
 
 APPNAME     = "pyconnmgr"
-APPVERSION  = "4.0.7"
-DBVERSION   = "hosts" + APPVERSION.replace(".","")
+APPVERSION  = "4.0.8.DEV"
+DBVERSION   = APPNAME + APPVERSION.replace(".","")
 APPCONFDIR  = "/.pyconnmgr"
-GLADE_FILE  = "/usr/share/pyconnmgr/pyconnmgr.glade"
-#GLADE_FILE  = "glade/pyconnmgr.glade"
+#GLADE_FILE  = "/usr/share/pyconnmgr/pyconnmgr.glade"
+GLADE_FILE  = "glade/pyconnmgr.glade"
 HOSTSFILE   = os.environ["HOME"] + APPCONFDIR + "/hostsfile.db"
 
 print "\n\n" + APPNAME + " version " + APPVERSION + "\n"
@@ -95,7 +95,10 @@ class ConnectionManager:
             17|ftpport|int|0||0
             18|ftpuser|text|0||0
             19|ftppath|text|0||0
-            20|<DBVERSION>|int|0||0  # this is used to keep the sql schema up to date
+            20|spicefull|int|0||0
+            21|spicezoom|int|0||0
+            22|spiceport|int|0||0
+            23|<DBVERSION>|int|0||0  # this is used to keep the sql schema up to date
             """
             currentschema = str(sqlcursor.fetchall())
             #check if current schema matches, update if not
@@ -121,19 +124,25 @@ class ConnectionManager:
                                         ftpport int,
                                         ftpuser text,
                                         ftppath text,
+                                        spicefull int,
+                                        spicezoom int,
+                                        spiceport int,
                                         {} int)'''.format(DBVERSION,DBVERSION))
                 sqlconn.commit()
+                #NOTE: DB updates are already done. Do not update the INSERT below with updated schema
                 sqlcursor.execute('''INSERT INTO {} 
                                         (name,tab,sshport,sshuser,sshopt,
                                         vncquality,vnccompresslevel,vncport,vncpassword,
                                         rdpgeom,rdpuser,rdpdom,
                                         sftpport,sftpuser,sftppath,smbuser,smbpath,
-                                        ftpport,ftpport,ftppath,{})
+                                        ftpport,ftpport,ftppath,
+                                        {})
                                     SELECT name,tab,sshport,sshuser,sshopt,
                                         vncquality,vnccompresslevel,vncport,vncpassword,
                                         rdpgeom,rdpuser,rdpdom,
                                         sftpport,sftpuser,sftppath,smbuser,smbpath,
-                                        ftpport,ftpport,ftppath,0 
+                                        ftpport,ftpport,ftppath,
+                                        0 
                                     FROM hosts'''.format(DBVERSION,DBVERSION))
                 sqlconn.commit()
                 sqlcursor.execute('''DROP TABLE IF EXISTS hosts''')
@@ -177,6 +186,9 @@ class ConnectionManager:
                                         ftpport int,
                                         ftpuser text,
                                         ftppath text,
+                                        spicefull int,
+                                        spicezoom int,
+                                        spiceport int,
                                         {} int)'''.format(DBVERSION))
                 sqlconn.commit()
                 sqlconn.close
@@ -217,12 +229,7 @@ class ConnectionManager:
         sqlconn = sqlite3.connect(HOSTSFILE)
         sqlcursor = sqlconn.cursor()
         #first look through the sqlite db, and assign values to variables
-        for row in sqlcursor.execute("SELECT * FROM hosts"):
-            if (row[0]):
-                hostname = row[0]
-            else:
-                hostname = ""
-
+        for row in sqlcursor.execute('SELECT * FROM hosts WHERE name=?', (host,)):
             if (row[1]):
                 tabposition = row[1]
             else:
@@ -318,40 +325,58 @@ class ConnectionManager:
             else:
                 hostftppath = ""
 
-            #next, if a proper host is entered, update the widgets with the
-            #above variables
-            if hostname == host:
-                self.tabbed_notebook.set_current_page(tabposition)
-                #SSH
-                self.ssh_port_sbtn.set_text(str(hostsshport))
-                self.ssh_port_sbtn.set_value(hostsshport)
-                self.ssh_user_entry.set_text(hostsshuser)
-                self.ssh_options_entry.set_text(hostsshopt)
-                #SFTP
-                self.sftp_port_sbtn.set_text(str(hostsftpport))
-                self.sftp_port_sbtn.set_value(hostsftpport)
-                self.sftp_user_entry.set_text(hostsftpuser)
-                self.sftp_path_entry.set_text(hostsftppath)
-                #VNC
-                self.vnc_quality_sbtn.set_text(str(hostvncquality))
-                self.vnc_quality_sbtn.set_value(hostvncquality)
-                self.vnc_compress_sbtn.set_text(str(hostvnccompresslevel))
-                self.vnc_compress_sbtn.set_value(hostvnccompresslevel)
-                self.vnc_port_sbtn.set_text(str(hostvncport))
-                self.vnc_port_sbtn.set_value(hostvncport)
-                self.vnc_password_entry.set_text(hostvncpassword)
-                #RDP
-                self.rdp_geometry_entry.set_text(hostrdpgeom)
-                self.rdp_user_entry.set_text(hostrdpuser)
-                self.rdp_domain_entry.set_text(hostrdpdom)
-                #SMB
-                self.smb_user_entry.set_text(hostsmbuser)
-                self.smb_path_entry.set_text(hostsmbpath)
-                #FTP
-                self.ftp_port_sbtn.set_text(str(hostftpport))
-                self.ftp_port_sbtn.set_value(hostftpport)
-                self.ftp_user_entry.set_text(hostftpuser)
-                self.ftp_path_entry.set_text(hostftppath)
+            if (row[20]):
+                self.spice_fullscreen_checkbutton.set_active(True)
+            else:
+                hostspicefull = ''
+
+            if (row[21]):
+                hostspicezoom = row[21]
+            else:
+                hostspicezoom = 100
+
+            if (row[22]):
+                hostspiceport = row[22]
+            else:
+                hostspiceport = 5900
+
+            #update the widgets with the above variables
+            self.tabbed_notebook.set_current_page(tabposition)
+            #SSH
+            self.ssh_port_sbtn.set_text(str(hostsshport))
+            self.ssh_port_sbtn.set_value(hostsshport)
+            self.ssh_user_entry.set_text(hostsshuser)
+            self.ssh_options_entry.set_text(hostsshopt)
+            #SFTP
+            self.sftp_port_sbtn.set_text(str(hostsftpport))
+            self.sftp_port_sbtn.set_value(hostsftpport)
+            self.sftp_user_entry.set_text(hostsftpuser)
+            self.sftp_path_entry.set_text(hostsftppath)
+            #VNC
+            self.vnc_quality_sbtn.set_text(str(hostvncquality))
+            self.vnc_quality_sbtn.set_value(hostvncquality)
+            self.vnc_compress_sbtn.set_text(str(hostvnccompresslevel))
+            self.vnc_compress_sbtn.set_value(hostvnccompresslevel)
+            self.vnc_port_sbtn.set_text(str(hostvncport))
+            self.vnc_port_sbtn.set_value(hostvncport)
+            self.vnc_password_entry.set_text(hostvncpassword)
+            #RDP
+            self.rdp_geometry_entry.set_text(hostrdpgeom)
+            self.rdp_user_entry.set_text(hostrdpuser)
+            self.rdp_domain_entry.set_text(hostrdpdom)
+            #SMB
+            self.smb_user_entry.set_text(hostsmbuser)
+            self.smb_path_entry.set_text(hostsmbpath)
+            #FTP
+            self.ftp_port_sbtn.set_text(str(hostftpport))
+            self.ftp_port_sbtn.set_value(hostftpport)
+            self.ftp_user_entry.set_text(hostftpuser)
+            self.ftp_path_entry.set_text(hostftppath)
+            #SPICE
+            self.spice_zoom_spinbutton.set_text(str(hostspicezoom))
+            self.spice_zoom_spinbutton.set_value(hostspicezoom)
+            self.spice_port_spinbutton.set_text(str(hostspiceport))
+            self.spice_port_spinbutton.set_value(hostspiceport)
         sqlconn.close
 
     def on_host_entry_changed(self, action):
@@ -361,7 +386,7 @@ class ConnectionManager:
     def update_host_info(self,host,sshport,sshuser,sshoptions, \
         vncquality,vnccompresslevel,vncport,vncpasswd, \
         rdpgeometry,rdpuser,rdpdomain,selectedtab,sftpport,sftpuser,sftppath, \
-        smbuser,smbpath,ftpport,ftpuser,ftppath):
+        smbuser,smbpath,ftpport,ftpuser,ftppath,spicefull,spicezoom,spiceport):
         """This function will update host information to the HOSTSFILE"""
         sqlconn = sqlite3.connect(HOSTSFILE)
         sqlcursor = sqlconn.cursor()
@@ -376,7 +401,8 @@ class ConnectionManager:
                         vncquality,vnccompresslevel,vncport,vncpasswd, \
                         rdpgeometry,rdpuser,rdpdomain, \
                         sftpport,sftpuser,sftppath,smbuser,smbpath, \
-                        ftpport,ftpuser,ftppath,host)
+                        ftpport,ftpuser,ftppath, \
+                        spicefull,spicezoom,spiceport,host)
                 sqlcursor.execute('''
                         UPDATE hosts SET
                                 tab=?,
@@ -397,16 +423,20 @@ class ConnectionManager:
                                 smbpath=?,
                                 ftpport=?,
                                 ftpuser=?,
-                                ftppath=?
+                                ftppath=?,
+                                spicefull=?,
+                                spicezoom=?,
+                                spiceport=?
                         WHERE name=? ''', values)
         if foundhost == "no":
             #host didn't exist, so insert new host information
             sqlcursor.execute('''
-                    INSERT INTO hosts VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    INSERT INTO hosts VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                     ''',(host,selectedtab,sshport,sshuser,sshoptions, \
                     vncquality,vnccompresslevel,vncport,vncpasswd, \
                     rdpgeometry,rdpuser,rdpdomain,sftpport,sftpuser, \
-                    sftppath,smbuser,smbpath,ftpport,ftpuser,ftppath,0) )
+                    sftppath,smbuser,smbpath,ftpport,ftpuser,ftppath,0, \
+                    spicefull,spicezoom,spiceport) )
         #update and close the database
         sqlconn.commit()
         sqlconn.close()
@@ -578,6 +608,11 @@ class ConnectionManager:
         ftpport = self.ftp_port_sbtn.get_text()
         ftpuser = self.ftp_user_entry.get_text()
         ftppath = self.ftp_path_entry.get_text()
+        spicefull = self.spice_fullscreen_checkbutton.get_active()
+        spicefullvalue = ''
+        spicezoom = self.spice_zoom_spinbutton.get_text()
+        spiceport = self.spice_port_spinbutton.get_text()
+        
         if len(host) != 0:
             if selectedtab == 0:
                 #we are on the SSH tab
@@ -643,12 +678,21 @@ class ConnectionManager:
                                 ftpport + ftppath
                 command = ['nautilus', nautilusURI]
                 commandspawn = Popen(command)
+            elif selectedtab == 6:
+                #we are on the SPICE tab
+                remoteURI = 'spice://' + host + ":" + spiceport 
+                command = ['remote-viewer', '-z', spicezoom, remoteURI]
+                if spicefull:
+                    command.append('-f')
+                    spicefullvalue = 1
+                commandspawn = Popen(command)
+            
             #now that the command has launched, update the sqlite db
             self.update_host_info(host,sshport,sshuser,sshoptions, \
                 vncquality,vnccompresslevel,vncport,vncpasswd, \
                 rdpgeometry,rdpuser,rdpdomain,selectedtab, \
                 sftpport,sftpuser,sftppath,smbuser,smbpath, \
-                ftpport,ftpuser,ftppath)
+                ftpport,ftpuser,ftppath,spicefullvalue,spicezoom,spiceport)
             self.populate_cmbox_hostlist()
             self.populate_cmbox_hostlist_entry_completion()
         else:
@@ -688,6 +732,9 @@ class ConnectionManager:
         self.ftp_port_sbtn = gtkbuilder.get_object('ftp_port_sbtn')
         self.ftp_user_entry = gtkbuilder.get_object('ftp_user_entry')
         self.ftp_path_entry = gtkbuilder.get_object('ftp_path_entry')
+        self.spice_fullscreen_checkbutton = gtkbuilder.get_object('spice_fullscreen_checkbutton')
+        self.spice_zoom_spinbutton = gtkbuilder.get_object('spice_zoom_spinbutton')
+        self.spice_port_spinbutton = gtkbuilder.get_object('spice_port_spinbutton')
         self.hosts_dialog = gtkbuilder.get_object('hosts_dialog')
         self.hosts_txtview = gtkbuilder.get_object('hosts_txtview')
         self.find_dialog_find_entry = gtkbuilder.get_object \
